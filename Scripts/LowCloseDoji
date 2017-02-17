@@ -1,0 +1,27 @@
+#Doji() from 1 bars ago and low from 1 bars ago is greater than close 
+def isdoji = Doji() from 1 bars ago;
+def Lowclose = low from 1 bars ago is greater than close ;
+plot LCD = isdoji and Lowclose;
+
+LCD.SetPaintingStrategy(PaintingStrategy.BOOLEAN_POINTS);
+LCD.SetDefaultColor(Color.YELLOW);
+#alert(LCD,"LCD", alert.bar, sound = Sound.Ring);
+AddChartBubble(isdoji and lowclose,low,"LCD");
+LCD.SetLineWeight(5);
+
+
+input length = 10;
+input displace = 0;
+
+def Range = TrueRange(High, Close, Low);
+
+
+def RangeAvg = Average(Range[-displace], length);
+
+def Rangestop = High + RangeAvg;
+
+plot avgtruerangestop = if LCD then Rangestop else 0;
+
+Avgtruerangestop.SetPaintingStrategy(PaintingStrategy.TRIANGLES);
+     avgtruerangestop.SetDefaultColor(Color.GREEN);
+ avgtruerangestop.SetLineWeight(5);
