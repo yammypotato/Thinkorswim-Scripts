@@ -1,0 +1,35 @@
+#High Close Doji (HCD) and Low Close Doji (LCD) with average true Range Stop\
+#Below is a set of scripts that incorporates a STOP using average true range 
+#once a High Close Doji (HCD) and Low Close Doji (LCD) has been identified.
+
+#HCD and LCD are used by John Person and it can be useful for identifying a high probability success trade. 
+#By incorporating a stop (e.g., Risk Management) using the average true range one can objectively identify 
+#a stop by incorporating some elements of dynamics (e.g. volatility).
+
+def isdoji =Doji() from 1 bars ago;
+def highclose= high from 1 bars ago is less than close;
+plot HCD= isdoji and highclose;
+
+HCD.SetPaintingStrategy(PaintingStrategy.BOOLEAN_POINTS);
+     HCD.SetDefaultColor(Color.CYAN);
+#alert(HCD,"HCD", alert.bar, sound = Sound.Ring);
+HCD.SetLineWeight(5);
+
+AddChartBubble(isdoji and highclose,high,"HCD", color = Color.GREEN);
+
+input length = 10;
+input displace = 0;
+
+def Range = TrueRange(High, Close, Low);
+
+
+def RangeAvg = Average(Range[-displace], length);
+
+def Rangestop = Low - RangeAvg;
+
+plot avgtruerangestop = if HCD then Rangestop else 0;
+
+Avgtruerangestop.SetPaintingStrategy(PaintingStrategy.SQUARES);
+     avgtruerangestop.SetDefaultColor(Color.CYAN);
+avgtruerangestop.SetLineWeight(5);
+
