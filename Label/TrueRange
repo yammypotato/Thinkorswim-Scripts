@@ -1,0 +1,15 @@
+#Shows the average of the true range for a period and percent of range relative
+#to the underlying.
+
+declare upper;
+
+input length = 10;
+input displace = 0;
+
+def Range = TrueRange(High, Close, Low);
+
+
+def RangeAvg = Average(Range[-displace], length);
+
+AddLabel(yes, "Avg Range past 10 periods: " + Round(RangeAvg,2) + " PCT: " + Round((RangeAvg/Close*100.0),2) + "%", Color.ORANGE);
+
