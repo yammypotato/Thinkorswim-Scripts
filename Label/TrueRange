@@ -1,6 +1,5 @@
-#Shows the average of the true range for a period and percent of range relative
-#to the underlying.
-
+#Shows the average of the true range for a period and percent of range relative to the underlying.
+#http://traderyam.blogspot.com/2016/03/tos-script-average-true-range.html
 declare upper;
 
 input length = 10;
