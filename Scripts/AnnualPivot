@@ -1,0 +1,78 @@
+#Annual Pivot Point Study
+#Pivots_Yearly
+#Change the input yearsback to change pivots by year
+def yr          = GetYear();
+def capture     = !IsNaN(close) and yr != yr[1];
+def yearCount   = CompoundValue(1, if capture
+                                 then yearCount[1] + 1
+                                 else yearCount[1], 0);
+def thisYear    = (HighestAll(yearCount) - yearCount) + 1;
+input yearsback = 0;#Hint yearsback: 0 = current year; 1 = 1yr back; etc
+def ph = CompoundValue(1, if thisYear[1] == 3 + yearsback and thisYear == 2 + yearsback
+                          then high
+                          else if thisYear == 2 + yearsback and high > ph[1]
+                          then high
+                          else ph[1], high);
+def pl = CompoundValue(1, if thisYear[1] == 3 + yearsback and thisYear == 2 + yearsback
+                          then low
+                          else if thisYear == 2 + yearsback  and low < pl[1]
+                          then low
+                          else pl[1], low);
+def pc = CompoundValue(1, if thisYear[1] == 3 + yearsback  and thisYear == 2 + yearsback
+                          then close
+                          else if thisYear == 2 + yearsback 
+                          then close
+                          else pc[1], close);
+
+plot pp = if thisYear == 1 + yearsback 
+          then (ph + pl + pc) / 3
+          else Double.NaN;
+plot R1 = 2 * PP - pl;
+plot S1 = 2 * PP - ph;
+plot R2 = PP + (ph - pl);
+plot S2 = PP - (ph - pl);
+plot R3 = R2 + (ph - pl);
+plot S3 = S2 - (ph - pl);
+plot R4 = R3 + (ph - pl);
+plot S4 = S3 - (ph - pl);
+
+PP.SetDefaultColor(Color.WHITE);
+R1.SetDefaultColor(Color.RED);
+R2.SetDefaultColor(Color.RED);
+R3.SetDefaultColor(Color.RED);
+R4.SetDefaultColor(Color.RED);
+S1.SetDefaultColor(Color.GREEN);
+S2.SetDefaultColor(Color.GREEN);
+S3.SetDefaultColor(Color.GREEN);
+S4.SetDefaultColor(Color.GREEN);
+
+#PP.HideBubble();
+#R1.HideBubble();
+R2.HideBubble();
+R3.HideBubble();
+R4.HideBubble();
+#S1.HideBubble();
+S2.HideBubble();
+S3.HideBubble();
+S4.HideBubble();
+
+input bubblemover = 8;
+def n             = bubblemover;
+def n1            = n + 1;
+
+input showbubbles    = yes;
+def StartPlot = if showbubbles == yes
+                then (IsNaN(close[n]) and !IsNaN(close[n1]))
+                else if showbubbles
+                then BarNumber() == HighestAll(BarNumber() - n)
+                else Double.NaN;
+
+AddChartBubble(StartPlot, R4[n1], "R4", Color.RED, if close[n1] > R4[n1] then no else yes);
+AddChartBubble(StartPlot, R3[n1], "R3", Color.RED, if close[n1] > R3[n1] then no else yes);
+AddChartBubble(StartPlot, R2[n1], "R2", Color.RED, if close[n1] > R2[n1] then no else yes);
+AddChartBubble(StartPlot, R1[n1], "R1", Color.RED, if close[n1] > R1[n1] then no else yes);
+AddChartBubble(StartPlot, PP[n1], "PP", if !IsNaN(close[n1]) > PP[n1] then Color.GREEN else Color.RED, if close[n1] > PP[n1] then no else yes);
+AddChartBubble(StartPlot, S4[n1], "S4", Color.GREEN, if close[n1] > S4[n1] then no else yes);
+AddChartBubble(StartPlot, S3[n1], "S3", Color.GREEN, if close[n1] > S3[n1] then no else yes);
+AddChartBubble(StartPlot, S2[n1], "S2", Color.GREEN, if close[n1] > S2[n1] then no else yes);
+AddChartBubble(StartPlot, S1[n1], "S1", Color.GREEN, if close[n1] > S1[n1] then no else yes);
