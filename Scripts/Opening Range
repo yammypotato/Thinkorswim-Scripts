@@ -1,0 +1,63 @@
+#JT 3 Candle BOX
+#Found somewhere on the internet
+input opentime = 0930;
+input ORend = 0945;
+def na = double.nan;
+#
+# Check if the opening range time is now
+#
+def ORActive = if getLastDay() == getDay() and 
+                               secondsFromTime(opentime) >= 0 and 
+                               secondsFromTime(ORend) < 0 
+                           then 1 else 0;
+#
+# Track the OR high and low
+#
+def ORHigh = if ORActive then high else na;
+def ORLow = if ORActive then low else na;
+#
+# Plot the OR high and low
+#
+plot ORAH = if getLastDay() != getDay() OR !ORActive then na else HighestAll(ORHigh);
+plot ORAL = if getLastDay() != getDay() OR !ORActive then na else LowestAll(ORLow);
+plot ORH = if getLastDay() != getDay() OR secondsFromTime(ORend) < 0 
+                     then na 
+                     else HighestAll(ORHigh);
+Plot ORL = if getLastDay() != getDay() OR secondsFromTime(ORend) < 0 
+                   then na 
+                   else LowestAll(ORLow);
+#
+# Formatting
+#
+ORAH.SetStyle(curve.short_dash);
+ORAL.SetStyle(curve.SHORT_DASH);
+ORAH.SetDefaultColor(color.green);
+ORAL.SetDefaultColor(color.red);
+ORH.SetStyle(curve.short_dash);
+ORL.SetStyle(curve.SHORT_DASH);
+ORH.SetDefaultColor(color.green);
+ORL.SetDefaultColor(color.red);
+#
+# Add Cloud creates the shading
+#
+AddCloud(ORH, ORL, color.LIGHT_GRAY);
+AddCloud(ORAL, ORAH);
+#
+# Alerts:
+#
+def alerttrigger = if (high >= ORH AND low <= ORH) OR 
+                                   (high >= ORL AND low <= ORL) 
+                               then 1 else 0; #replace the 1 with your definition
+
+# BLOCK CODE BELOW
+input alerttext = "OR Breakout!";
+input UseAlerts = {false, default true};
+input AlertType = {default "BAR", "ONCE", "TICK"};
+def at = AlertType;
+input AlertSound = {"Bell", "Chimes", default "Ding", "NoSound", "Ring"};
+alert(alerttrigger AND UseAlerts, alerttext, 
+          if at == 1 
+          then Alert.ONCE 
+          else if at == 2 
+                  then Alert.TICK 
+                  else Alert.BAR, AlertSound);plot Data = close;
