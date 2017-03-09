@@ -1,0 +1,62 @@
+# GlobeX or Overnight High / Low 
+# Mobius 
+# V01.2012 
+ 
+ 
+input PlotOverNightExtremes = yes; 
+ 
+def o = open; 
+def h = high; 
+def l = low; 
+def c = close; 
+def bar = barNumber(); 
+def Intraday = if GetAggregationPeriod() < 86400000 
+               then 1 
+               else 0; 
+def OverNightActive =  if (SecondsFromTime(1700) >= 0 and 
+                           SecondsTillTime(0000) <= 0) 
+                          or 
+                          (SecondsFromTime(0000) >= 0 and  
+                           SecondsFromTime(0930) < 0) 
+                        then 1 
+                       else Double.NaN; 
+def ONhigh = if !IsNaN(OverNightActive) and IsNaN(OverNightActive[1]) 
+             then h 
+             else if !IsNaN(OverNightActive) and  
+                     h > ONhigh[1] 
+                  then h 
+                  else ONhigh[1]; 
+def ONhighBar = if !IsNaN(OverNightActive) and h == ONhigh 
+                then BarNumber()  
+                else ONhighBar[1]; 
+def ONlow = if !IsNaN(OverNightActive) and IsNaN(OverNightActive[1]) and IsNaN(ONlow[1]) 
+            then l 
+            else if IsNaN(OverNightActive) 
+                 then Double.NaN 
+            else if !IsNaN(OverNightActive) and  
+                    l < ONlow[1] 
+                 then l 
+                 else ONlow[1]; 
+def ONlowBar = if !IsNaN(OverNightActive) and l == ONlow 
+               then BarNumber() 
+               else ONlowBar[1]; 
+def OverNightHigh = if BarNumber() == HighestAll(ONhighBar)  
+                    then h  
+                    else OverNightHigh[1]; 
+def OverNightLow = if BarNumber() == HighestAll(ONlowBar)  
+                   then l  
+                   else OverNightLow[1]; 
+plot ONH = if Intraday 
+           then OverNightHigh 
+           else Double.NaN; 
+ONH.SetHiding(!PlotOverNightExtremes); 
+ONH.SetPaintingStrategy(PaintingStrategy.SQUARES); 
+ONH.SetDefaultColor(Color.BLUE); 
+plot ONL = if Intraday 
+           then OverNightLow 
+           else Double.NaN; 
+ONL.SetHiding(!PlotOverNightExtremes); 
+ONL.SetPaintingStrategy(PaintingStrategy.SQUARES); 
+ONL.SetDefaultColor(Color.GRAY); 
+AddChartBubble(bar == ONhighBar and PlotOverNightExtremes, ONH, "ONH", Color.BLUE); 
+AddChartBubble(bar == ONlowBar and PlotOverNightExtremes, ONL, "ONL", Color.GRAY, 0); 
