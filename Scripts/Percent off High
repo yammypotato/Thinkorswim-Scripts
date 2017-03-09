@@ -1,0 +1,14 @@
+#HINT: This chart label shows the percent change down from the high.above \n\n IMPORTANT: If a new IPO you need to change the length to max of number of days since IPO release.
+
+input length = 252;  #HINT length: There are 252 trading days in a year
+input show_label = yes;
+input Label_Color_Choice = {"magenta", "green", "pink", "cyan", "orange", default "red", "blue", "gray", "violet"};
+
+def top = highest(high(period = AggregationPeriod.DAY), length);
+def prctDrop = ((close(period = AggregationPeriod.DAY)/top)-1);
+
+def NewHigh = high == top;
+
+AddLabel(show_label and !NewHigh, "Percent down off high: ( " +  AsPercent(prctDrop) + " )  ", GetColor(Label_Color_Choice));
+
+AddLabel(show_label and NewHigh, "new 52-week high TODAY", (CreateColor(51, 204, 0)));
