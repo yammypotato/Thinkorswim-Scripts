@@ -1,0 +1,46 @@
+                  Sqr(stdev(secondary, length)); 
+    def calc1 = Beta1 / (Beta1 + Beta2); 
+    def calc2 = Allowance_in_Dollars * calc1; 
+    def calc3 = Allowance_in_Dollars - calc2; 
+    def PrimaryShrs = calc3 / first; 
+    def Primary2Shrs = calc2 / second; 
+  
+# Calculations for Dollar weighting 
+    def DvaluePshrs = Round((Allowance_in_dollars / 2) / first, 0); 
+    def DvaluePshrs2 = Round((Allowance_in_dollars / 2) / second, 0); 
+  
+AddLabel(Dollar_Wt == yes, concat(getSymbolPart(1),  
+                           concat(" $ WT:",  
+                           concat(" ", DvaluePshrs))), color.white); 
+AddLabel(Dollar_Wt == yes, concat(getSymbolPart(2),  
+                           concat(" $ WT:",  
+                           concat(" ", DvaluePshrs2))), color.white); 
+  
+# Correlation calculations 
+plot Correlation = correlation(first, second, length); 
+      Correlation.SetDefaultColor(Color.Yellow); 
+  
+# Chart Labels for ß-Shares and Dashboard 
+AddLabel(Beta_Wt == yes, concat(getSymbolPart(1),  
+                         concat(" ß WT:",  
+                         concat(" ", round(PrimaryShrs, 0)))), color.white); 
+AddLabel(Beta_Wt == yes, concat(getSymbolPart(2),  
+                         concat(" ß WT:",  
+                         concat(" ", round(Primary2Shrs, 0)))), color.white); 
+AddLabel(yes, concat("Avg Corr: ",  
+                     Round(Average(correlation, 60), 2)), color.white); 
+AddLabel(Dashboard_On == yes, concat("Beta1: ", Beta1), color.white); 
+AddLabel(Dashboard_On == yes, concat("Beta2: ", Beta2), color.white); 
+AddLabel(Dashboard_On == yes, concat("Calc1: ", calc1), color.white); 
+AddLabel(Dashboard_On == yes, concat("Calc2: $", calc2), color.white); 
+AddLabel(Dashboard_On == yes, concat("Calc3: $", calc3), color.white); 
+AddLabel(Dashboard_On == yes, concat("Total: $", (calc2 + calc3)), color.white); 
+  
+# End Code 
+  
+#16:40 Mobius: The Above Study MUST be used on the Pairs Trader Page or with a PAIR in the symbol Window 
+#16:42 bigworm: I have been reading up on quant finance and they have a formula for beta I was thinking of using that 
+#16:42 Mobius: If your using another program I'd calc the beta along with all other calculation on that platform. I'm not big of data entry 
+#16:43 bigworm: Ok. So in your previous example with a beta of 2 and 1.5 would I buy .5 more shares than the other? 
+#16:44 Mobius: there's a few different ways to calc beta. As long as your consistent it doesn't matter much 
+  
