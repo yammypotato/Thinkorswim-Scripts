@@ -1,0 +1,152 @@
+# Idea found here:
+# http://www.forbes.com/sites/tomaspray/2014/02/08/the-most-powerful-pivot-level-2/2/ 
+
+ 
+## START STUDY
+## QuarterlyPivots_Profile
+## linus, 2014-02-10, v0.1
+ 
+#hint: Displays Quarterly Person's pivots, and Profile for the quarter.  Q1 is Jan-Mar, Q2 is Apr-Jun, Q3 is Jul-Sep, Q4 is Oct-Dec.
+ 
+declare upper;
+ 
+#hint showHLC: Yes to show high, low, close lines from previous quarter; No to hide lines. (default is No)
+input showHLC = No;
+ 
+#hint showSR3: How to display QR3 and QS3 - PP for Person's, ST for Standard, Off to hide. (default is Off)
+input showSR3 = {default Off, PP, ST}; 
+ 
+#hint line: Vertical line style 1..4 to separate quarters, or 0 to disable line. (default is 2)
+input line = 2;
+ 
+#hint profileType: Choose TimeProfile or VolumeProfile to show the profile, or Hide to hide the profile. (default is Volume)
+input profileType = {Hide, Time, default Volume};
+ 
+#hint PricePerRow: Height of profile bars. (default is AUTOMATIC)
+input PricePerRow = PricePerRow.AUTOMATIC;
+ 
+#hint onExpansion: If Off, profile is shown on chart for each quarter. \n\n If All, profile is shown in right expansion as one profile all chart data. \n\n If Last, profile is shown in right expansion for the last quarter's data. (default is Off)
+input onExpansion = {default Off, All, Last}; 
+ 
+#hint numProfiles: The number of profiles to show on chart, if onExpansion is Off. (default is 5)
+input numProfiles = 5; 
+ 
+#hint VAPercent: Value area as a percent of the profile data. (default is 70)
+input VAPercent = 70;
+ 
+#hint opacity: Opacity of the profile bars. (default is 50)
+input opacity = 50;
+ 
+#hint showPOC: Yes to show point of control cloud, No to hide. (default is Yes)
+input showPOC = Yes;
+ 
+#hint showVA: Yes to show value area cloud, No to hide. (default is Yes)
+input showVA = Yes;
+ 
+DefineGlobalColor("Profile", CreateColor(0,0,130));
+DefineGlobalColor("PtOfControl", Color.ORANGE);
+DefineGlobalColor("ValueArea", Color.WHITE);
+ 
+# qtr = 0 if start of new quarter.
+def qtr = (GetMonth() - 1) % 3;
+ 
+def newQtr = qtr == 0 and qtr[1] != 0;
+ 
+def QCount = compoundValue(1, if newQtr then if QCount[1] == 4 then 1 else QCount[1] + 1 else QCount[1], 1);
+ 
+# Current quarter's highs and lows:
+rec rCurQH = compoundValue(1, if newQtr then high else if high > rCurQH[1] then high else rCurQH[1], high);
+ 
+rec rCurQL = compoundValue(1, if newQtr then low else if low < rCurQL[1] then low else rCurQL[1], low);
+ 
+# Previous quarter's high (QH), low (QL), close (QC).
+rec rQH = if newQtr then rCurQH[1] else rQH[1];
+rec rQL = if newQtr then rCurQL[1] else rQL[1];
+rec rQC = if newQtr then close[1] else rQC[1];
+ 
+plot QH = if showHLC then rQH else Double.NaN;
+plot QL = if showHLC then rQL else Double.NaN;
+plot QC = if showHLC then rQC else Double.NaN;
+ 
+QH.SetPaintingStrategy(PaintingStrategy.DASHES);
+QL.SetPaintingStrategy(PaintingStrategy.DASHES);
+QC.SetPaintingStrategy(PaintingStrategy.DASHES);
+ 
+QH.SetDefaultColor(Color.DARK_RED);
+QL.SetDefaultColor(Color.DARK_GREEN);
+QC.SetDefaultColor(Color.YELLOW);
+ 
+# Quarterly pivots:
+def rng = rQH – rQL;
+ 
+plot QP = (rQH + rQL + rQC)/3;
+plot QR1 = (QP * 2) – rQL;
+plot QR2 = QP + rng; 
+ 
+plot QS1 = (QP * 2) – rQH;
+plot QS2 = QP – rng;
+ 
+plot QR3;
+plot QS3;
+ 
+switch (ShowSR3){
+case Off:
+    QR3 = Double.NaN;
+    QS3 = Double.NaN;
+case PP:
+    QR3 = QR2 + rng;
+    QS3 = QS2 – rng;
+case ST:
+    QR3 = rQH + (2 * (QP - rQL));
+    QS3 = rQL - (2 * (rQH - QP));
+}
+ 
+QP.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+QR1.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+#QR2.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+#QR3.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+QS1.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+#QS2.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+#QS3.SetPaintingStrategy(PaintingStrategy.HORIZONTAL);
+ 
+QP.SetDefaultColor(Color.CYAN);
+QR1.SetDefaultColor(Color.PINK);
+#QR2.SetDefaultColor(Color.PINK);
+#QR3.SetDefaultColor(Color.RED);
+QS1.SetDefaultColor(Color.LIGHT_GREEN);
+#QS2.SetDefaultColor(Color.LIGHT_GREEN);
+#QS3.SetDefaultColor(Color.GREEN);
+ 
+AddVerticalLine(line and newQtr, "Q" + QCount, Color.GRAY, line);
+ 
+def startPro = if onExpansion != onExpansion.All then newQtr else 0;
+ 
+## VOLUME/TIME PROFILE
+profile pro = if profileType == profileType.Volume then 
+VolumeProfile(
+    pricePerRow = PricePerRow, 
+    startNewProfile = startPro, 
+    onExpansion = onExpansion,
+    numberOfProfiles = numProfiles,
+    "value area percent" = VAPercent
+) 
+else 
+TimeProfile(
+    pricePerRow = PricePerRow, 
+    startNewProfile = startPro, 
+    onExpansion = onExpansion, 
+    numberOfProfiles = numProfiles,
+    "value area percent" = VAPercent
+);
+ 
+rec rPrevVAH = compoundValue(1, if startPro[1] then pro.GetHighestValueArea()[2] else if startPro then Double.NaN else rPrevVAH[1], Double.NaN);
+ 
+rec rPrevPOC = compoundValue(1, if startPro[1] then pro.GetPointOfControl()[2] else if startPro then Double.NaN else rPrevPOC[1], Double.NaN);
+ 
+rec rPrevVAL = compoundValue(1, if startPro[1] then pro.GetLowestValueArea()[2] else if startPro then Double.NaN else rPrevVAL[1], Double.NaN);
+ 
+
+ 
+pro.Show(color=GlobalColor("profile"), "poc color"=if showPOC then GlobalColor("PtOfControl") else Color.CURRENT, "va color"=if showVA then GlobalColor("ValueArea") else Color.CURRENT, opacity=if profileType != profileType.Hide then opacity else 0);
+ 
+## END STUDY
