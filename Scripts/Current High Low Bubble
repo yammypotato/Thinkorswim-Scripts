@@ -1,0 +1,15 @@
+#HINT: This plots the high and low used for intraday \n\n 
+
+input showOnlyToday =yes;
+input timeFrame = {default DAY, "2 DAYS", "3 DAYS", "4 DAYS", WEEK, MONTH, "OPT EXP"};
+AddChartBubble(if showOnlyToday and GetDay() != GetLastDay()
+               then Double.NaN 
+               else high == high(period = timeFrame), 
+               high, 
+              "High of " + timeFrame + ": " + high, 
+               Color.GREEN, yes);
+AddChartBubble(if showOnlyToday and GetDay() != GetLastDay() 
+               then Double.NaN else low == low(period = timeFrame), 
+               low, 
+              "Low of " + timeFrame + ": " + low, 
+               Color.GREEN, no);
