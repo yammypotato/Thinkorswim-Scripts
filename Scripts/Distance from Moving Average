@@ -1,0 +1,16 @@
+declare lower;
+input price = close;
+input length = 21;
+input displace = 0;
+input over_REACH = 50;
+
+plot distanceFromAvg = price - MovingAverage(data = price, length = length);
+
+
+plot overReach =over_reach;
+
+overreach.SetLineWeight(lineWeight = 3);
+
+#distanceFromAvg.SetDefaultColor(Color.DARK_GREEN);
+
+
