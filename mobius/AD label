@@ -1,0 +1,13 @@
+# AD Label 
+# Mobius 
+# Chat Room Request 04.26.2016 
+# input Symbol
+ 
+ 
+input SYMB = "$ADSPD"; 
+ 
+ 
+def AD = close(symbol = SYMB); 
+AddLabel(1, "AD: " + SYMB + " = " +  AD, color.white); 
+# End Code 
+ 
