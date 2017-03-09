@@ -1,0 +1,12 @@
+declare lower;
+input price = close;
+input length = 21;
+input displace = 0;
+
+plot OBV = TotalSum(Sign(close - close[1]) * volume);
+plot OBV_Avg = Average(OBV[-displace],length);
+
+
+OBV.SetDefaultColor(Color.Cyan);
+OBV_Avg.setdefaultcolor(Color.black);
+
