@@ -1,0 +1,31 @@
+
+def isdoji =Doji() from 1 bars ago;
+def highclose= high from 1 bars ago is less than close;
+
+
+plot HCD= isdoji  and highclose;
+
+HCD.SetPaintingStrategy(PaintingStrategy.BOOLEAN_POINTS);
+     HCD.SetDefaultColor(Color.CYAN);
+#alert(HCD,"HCD", alert.bar, sound = Sound.Ring);
+HCD.SetLineWeight(5);
+
+AddChartBubble(isdoji and highclose,high,"HCD", color = Color.GREEN);
+
+input length = 10;
+input displace = 0;
+
+def Range = TrueRange(High, Close, Low);
+
+
+def RangeAvg = Average(Range[-displace], length);
+
+def Rangestop = Low - RangeAvg;
+
+plot avgtruerangestop = if HCD then Rangestop else 0;
+
+Avgtruerangestop.SetPaintingStrategy(PaintingStrategy.TRIANGLES);
+     avgtruerangestop.SetDefaultColor(Color.CYAN);
+avgtruerangestop.SetLineWeight(5);
+AddChartBubble("time condition" = avgtruerangestop, "price location" = Rangestop, text = Rangestop, color = Color.LIGHT_RED, up = No);
+
