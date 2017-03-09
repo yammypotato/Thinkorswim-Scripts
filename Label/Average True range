@@ -1,0 +1,12 @@
+#Shows the average of the true range for a period and percent of range relative
+#to the underlying.
+
+declare upper;
+
+input length = 10;
+input displace = 0;
+
+def Range = TrueRange(High, Close, Low);
+
+
+plot RangeAvg = Average(Range[-displace], length);
