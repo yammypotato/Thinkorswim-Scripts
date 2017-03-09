@@ -1,0 +1,33 @@
+# MA Bullish Scan
+# DMonkey
+# 3.5.2017
+
+# alex7971: would like to scan for stocks with the following four
+# conditions together with an audible alert "9 EMA Trigger" as well
+#
+# o  The price moves above the 9 EMA
+# o  This moving average should be ascending and above the 20 EMA
+# o  Up volume is positive and greater than +2:1
+# o  RSI should be rising, i.e. sloping up and above 50. 
+#    This script utlize a clean way to use several conditions
+
+declare lower;
+
+input price = close;
+input length1 = 9;
+input length2 = 20;
+def v = volume;
+
+def ma1 = ExpAverage(price, length1);
+def ma2 = ExpAverage(price, length2);
+
+def rsi = RSI(length = 13, "over bought" = 70, "over sold" = 30, price = HL2, "average type" = "EXPONENTIAL");
+
+def condition1 = price crosses above ma1;
+def condition2 = (ma1 > ma1[1]) and (ma1 > ma2);
+def condition3 = v > (v[1] * 2);
+def condition4 = rsi > rsi[1] and rsi > 50;
+
+plot all_true = (condition1 + condition2 + condition3 + condition4) == 4;
+
+Alert(all_true, text = "9 EMA Trigger", Alert.BAR, Sound.Ring);
