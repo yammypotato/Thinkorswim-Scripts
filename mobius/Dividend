@@ -1,0 +1,10 @@
+# WatchList Days Till X Dividend 
+# If over 30 days away shows 30 
+# Mobius 
+ 
+ 
+def LastDividendBar = AbsValue(GetEventOffset(Events.DIVIDEND, 0)); 
+def NextDividend = if isNaN(LastDividendBar) then 0 else LastDividendBar; 
+AddLabel(NextDividend == 30, "Dividend More than 30 days out", color.white); 
+AddLabel(NextDividend <= 29 and NextDividend > 0, "Dividend in " + NextDividend + " days", Color.Red); 
+ 
