@@ -1,0 +1,41 @@
+#Created 2/24
+#Creates color codes for Wiliam %R
+
+declare lower;
+
+input length = 30;
+input over_Bought = -20;
+input over_Sold = -80;
+input price = close;
+input averageType = AverageType.WILDERS;
+
+
+
+#William
+
+def hh = Highest(high, length);
+def ll = Lowest(low, length);
+def result = if hh == ll then -100 else (hh - close) / (hh - ll) * (-100);
+
+plot WR = if result > 0 then 0 else result;
+WR.SetDefaultColor(GetColor(1));
+
+#end william
+
+
+#def NetChgAvg = MovingAverage(averageType, price - price[1], length);
+#def TotChgAvg = MovingAverage(averageType, AbsValue(price - price[1]), length);
+#def ChgRatio = if TotChgAvg != 0 then NetChgAvg / TotChgAvg else 0;
+
+#plot RSI = 50 * (ChgRatio + 1);
+plot OverSold = over_Sold;
+plot OverBought = over_Bought;
+
+WR.DefineColor("OverBought", GetColor(6));
+WR.DefineColor("Normal", GetColor(7));
+WR.DefineColor("OverSold", GetColor(1));
+WR.AssignValueColor(if WR > over_Bought then WR.color("OverBought") else if WR < over_Sold 
+then WR.color("OverSold") else WR.color("Normal"));
+WR.SetLineWeight(5);
+OverSold.SetDefaultColor(GetColor(8));
+OverBought.SetDefaultColor(GetColor(8));
