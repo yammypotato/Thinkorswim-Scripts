@@ -1,0 +1,97 @@
+#Hint: Breadth Script
+#JustinWilliams(Jay),Justin@TheInfinityGroup.us
+
+#Twitter=@JyWll , TOSChat=WaterFrontTrader
+
+#06/28/11: Added histogram function to show breadth ratio graphically.
+#12/27/13: Added breadth functions for RUT,DOW and S&P. Added custom labels on/off and histogram function to all indexes.
+
+#To plot only a histogram of the breadth ratio (the way I use it), go into the options and move the script from "Price" to the "Lower" section
+
+input ShowNYSELabel = yes;
+input ShowNASDLabel = yes;
+input ShowRUTLabel = yes;
+input ShowDOWLabel = yes;
+input ShowSPLabel = yes;
+
+def UVOL = close(“$UVOL”);
+def DVOL = close(“$DVOL”);
+def UVOLQ = close(“$UVOL/Q”);
+def DVOLQ = close(“$DVOL/Q”);
+def UVOLR = close(“$UVOLRL”);
+def DVOLR = close(“$DVOLRL”);
+def UVOLD = close(“$UVOLI”);
+def DVOLD = close(“$DVOLI”);
+def UVOLS = close(“$UVOLSP”);
+def DVOLS = close(“$DVOLSP”);
+
+#NYSE Breadth ratio
+def NYSEratio =  if (UVOL >= DVOL) then (UVOL / DVOL) else -(DVOL / UVOL);
+AddLabel(ShowNYSELabel, AsText(NYSEratio) + ” :1 NYSE”, if NYSEratio >= 0 then Color.GREEN else Color.RED);
+
+#Nasdaq Breadth ratio
+def NASDratio =  if (UVOLQ >= DVOLQ) then (UVOLQ / DVOLQ) else -(DVOLQ / UVOLQ) ;
+AddLabel(ShowNASDLabel, AsText(NASDratio) + ” :1 NASD”, if NASDratio >= 0 then Color.GREEN else Color.RED);
+
+#RUT Breadth ratio
+def RUTratio =  if (UVOLR >= DVOLR) then (UVOLR / DVOLR) else -(DVOLR/ UVOLR) ;
+AddLabel(ShowRUTLabel, AsText(RUTratio) + ” :1 RUT”, if RUTratio >= 0 then Color.GREEN else Color.RED);
+
+#DOW Breadth ratio
+def DOWratio =  if (UVOLD >= DVOLD) then (UVOLD / DVOLD) else -(DVOLD/ UVOLD) ;
+AddLabel(ShowDOWLabel, AsText(DOWratio ) + ” :1 DOW”, if DOWratio  >= 0 then Color.GREEN else Color.RED);
+
+#SP500 Breadth ratio
+def SPratio =  if (UVOLS >= DVOLS) then (UVOLS / DVOLS) else -(DVOLS/ UVOLS) ;
+AddLabel(ShowSPLabel, AsText(SPratio ) + ” :1 S&P”, if SPratio  >= 0 then Color.GREEN else Color.RED);
+
+#Histogram Function
+plot BreadthNYSE = if close==(UVOL-DVOL) then NYSEratio else Double.NaN;
+BreadthNYSE.AssignValueColor(if BreadthNYSE >= 0 then Color.GREEN else Color.RED);
+BreadthNYSE.SetPaintingStrategy(PaintingStrategy.HISTOGRAM);
+BreadthNYSE.SetLineWeight(1);
+plot NYSEzeroline = if close==(UVOL-DVOL) then 0 else Double.NaN;
+NYSEzeroline.AssignValueColor(if NYSEratio > 0 then Color.GREEN else Color.RED);
+NYSEzeroline.SetLineWeight(1);
+NYSEzeroline.HideTitle();
+NYSEzeroline.HideBubble();
+
+plot BreadthNASD = if close==(UVOLQ-DVOLQ) then NASDratio else Double.NaN;
+BreadthNASD.AssignValueColor(if BreadthNASD >= 0 then Color.GREEN else Color.RED);
+BreadthNASD.SetPaintingStrategy(PaintingStrategy.HISTOGRAM);
+BreadthNASD.SetLineWeight(1);
+plot NASDzeroline = if close==(UVOLQ-DVOLQ) then 0 else Double.NaN;
+NASDzeroline.AssignValueColor(if NASDratio > 0 then Color.GREEN else Color.RED);
+NASDzeroline.SetLineWeight(1);
+NASDzeroline.HideTitle();
+NASDzeroline.HideBubble();
+
+plot BreadthRUT = if close==(UVOLR-DVOLR) then RUTratio else Double.NaN;
+BreadthRUT.AssignValueColor(if BreadthRUT >= 0 then Color.GREEN else Color.RED);
+BreadthRUT.SetPaintingStrategy(PaintingStrategy.HISTOGRAM);
+BreadthRUT.SetLineWeight(1);
+plot RUTzeroline = if close==(UVOLR-DVOLR) then 0 else Double.NaN;
+RUTzeroline.AssignValueColor(if RUTratio > 0 then Color.GREEN else Color.RED);
+RUTzeroline.SetLineWeight(1);
+RUTzeroline.HideTitle();
+RUTzeroline.HideBubble();
+
+plot BreadthDOW = if close==(UVOLD-DVOLD) then DOWratio else Double.NaN;
+BreadthDOW.AssignValueColor(if BreadthDOW >= 0 then Color.GREEN else Color.RED);
+BreadthDOW.SetPaintingStrategy(PaintingStrategy.HISTOGRAM);
+BreadthDOW.SetLineWeight(1);
+plot DOWzeroline = if close==(UVOLD-DVOLD) then 0 else Double.NaN;
+DOWzeroline.AssignValueColor(if DOWratio > 0 then Color.GREEN else Color.RED);
+DOWzeroline.SetLineWeight(1);
+DOWzeroline.HideTitle();
+DOWzeroline.HideBubble();
+
+plot BreadthSP = if close==(UVOLS-DVOLS) then SPratio else Double.NaN;
+BreadthSP.AssignValueColor(if BreadthSP >= 0 then Color.GREEN else Color.RED);
+BreadthSP.SetPaintingStrategy(PaintingStrategy.HISTOGRAM);
+BreadthSP.SetLineWeight(1);
+plot SPzeroline = if close==(UVOLS-DVOLS) then 0 else Double.NaN;
+SPzeroline.AssignValueColor(if SPratio > 0 then Color.GREEN else Color.RED);
+SPzeroline.SetLineWeight(1);
+SPzeroline.HideTitle();
+SPzeroline.HideBubble();
