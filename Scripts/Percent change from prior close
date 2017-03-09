@@ -1,0 +1,10 @@
+#HINT: This study plots a chart label for Net Change and Percent Change from prior close (regardless of time period of the chart.
+
+input period_Type = AggregationPeriod.DAY;
+
+def begin = close(period = period_Type)[1];
+def end = close(period = period_Type);
+def NetChg = end - begin;
+def PctChg = (end / begin) - 1;
+addlabel(yes,"Short level  ES: 2315 NQ:5208",color.green);
+AddLabel(yes, "Change from Prior close:  " + AsDollars(NetChg) + "  " + AsPercent(PctChg), if NetChg > 0 then Color.GREEN else if NetChg < 0 then color.RED else color.LIGHT_GRAY);
