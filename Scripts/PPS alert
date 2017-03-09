@@ -1,0 +1,8 @@
+#John Person PPS buy and sell alerts
+
+def ppsBuy = pps()."BuySignal";
+def ppsSell = PPS().SellSignal;
+
+
+AddChartBubble(ppsBuy,high,"PPSBuy", color = Color.GREEN);
+AddChartBubble(ppsSell,low,"PPSSell", color = Color.RED);
